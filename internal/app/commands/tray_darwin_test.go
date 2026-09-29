@@ -32,6 +32,28 @@ func TestCompactDuration(t *testing.T) {
 	}
 }
 
+func TestTrayTitle(t *testing.T) {
+	cases := map[string]struct {
+		project string
+		elapsed time.Duration
+		want    string
+	}{
+		"with project":        {"Reading", 5 * time.Minute, "Reading: 5m"},
+		"with project, hours": {"Writing", time.Hour + 5*time.Minute, "Writing: 1:05"},
+		"no project":          {"", 5 * time.Minute, "5m"},
+	}
+
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			activity := models.Activity{
+				Project:   tc.project,
+				StartTime: time.Now().Add(-tc.elapsed),
+			}
+			assert.Equal(t, tc.want, trayTitle(&activity))
+		})
+	}
+}
+
 func TestMenuDuration(t *testing.T) {
 	cases := map[string]struct {
 		in   time.Duration

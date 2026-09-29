@@ -184,7 +184,7 @@ func (c *trayController) refresh(ctx context.Context) {
 	c.sawActivity = true
 	label := activityLabel(running)
 	systray.SetTemplateIcon(trayPlayIconPNG, trayPlayIconPNG)
-	systray.SetTitle(compactDuration(running.Duration()))
+	systray.SetTitle(trayTitle(running))
 	systray.SetTooltip(label)
 	c.mStop.SetTitle(c.loc.Format("tray.menu.stop_running", label))
 	c.mStop.Enable()
@@ -299,6 +299,16 @@ func (c *trayController) refreshRecent(ctx context.Context) {
 	} else {
 		c.mRecent.Enable()
 	}
+}
+
+// trayTitle formats the menu bar title as "<Project>: <running-time>", falling
+// back to just the running time when the activity has no project.
+func trayTitle(a *models.Activity) string {
+	duration := compactDuration(a.Duration())
+	if a.Project == "" {
+		return duration
+	}
+	return a.Project + ": " + duration
 }
 
 // compactDuration formats an elapsed duration for the menu bar without ticking
