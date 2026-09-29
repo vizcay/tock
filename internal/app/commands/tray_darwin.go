@@ -91,10 +91,6 @@ func runTray(cmd *cobra.Command) error {
 }
 
 func (c *trayController) onReady(ctx context.Context) {
-	if icon := trayIconPNG(); len(icon) > 0 {
-		systray.SetTemplateIcon(icon, icon)
-	}
-
 	// "Today" summary: total tracked time today with a per-project breakdown in
 	// a submenu. Info only — the parent just expands, the rows are disabled.
 	c.mToday = systray.AddMenuItem(c.loc.Text("tray.menu.today_empty"), "")
@@ -176,6 +172,7 @@ func (c *trayController) refresh(ctx context.Context) {
 			return
 		}
 		// Icon only when idle; the timer text appears next to it while running.
+		systray.SetTemplateIcon(trayIdleIconPNG, trayIdleIconPNG)
 		systray.SetTitle("")
 		systray.SetTooltip(c.loc.Text("tray.tooltip.idle"))
 		c.mStop.SetTitle(c.loc.Text("tray.menu.stop"))
@@ -186,6 +183,7 @@ func (c *trayController) refresh(ctx context.Context) {
 
 	c.sawActivity = true
 	label := activityLabel(running)
+	systray.SetTemplateIcon(trayPlayIconPNG, trayPlayIconPNG)
 	systray.SetTitle(compactDuration(running.Duration()))
 	systray.SetTooltip(label)
 	c.mStop.SetTitle(c.loc.Format("tray.menu.stop_running", label))
